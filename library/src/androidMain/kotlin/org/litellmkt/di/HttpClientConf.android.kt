@@ -1,5 +1,10 @@
 package org.litellmkt.di
 
-actual fun getActualDeviceEngine(): HttpClientLocalEngine {
-    TODO("Not yet implemented")
+import io.ktor.client.engine.HttpClientEngineFactory
+import io.ktor.client.engine.android.Android
+
+internal actual fun getActualDeviceEngine(): HttpClientLocalEngine {
+    return object: HttpClientLocalEngine{
+        override fun invoke(): HttpClientEngineFactory<*> = Android
+    }
 }

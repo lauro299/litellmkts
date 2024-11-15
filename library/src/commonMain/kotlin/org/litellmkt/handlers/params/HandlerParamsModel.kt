@@ -1,4 +1,4 @@
-package org.litellmkt.params
+package org.litellmkt.handlers.params
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

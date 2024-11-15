@@ -1,4 +1,7 @@
 package org.litellmkt
 
-class Features {
+enum class Features {
+    GENERATE,
+    CHAT,
+    EMBED
 }

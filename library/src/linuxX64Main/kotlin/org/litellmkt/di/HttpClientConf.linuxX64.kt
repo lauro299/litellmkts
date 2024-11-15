@@ -1,5 +1,10 @@
 package org.litellmkt.di
 
+import io.ktor.client.engine.HttpClientEngineFactory
+import io.ktor.client.engine.curl.Curl
+
 internal actual fun getActualDeviceEngine(): HttpClientLocalEngine {
-    TODO("Not yet implemented")
+    return object: HttpClientLocalEngine{
+        override fun invoke(): HttpClientEngineFactory<*> = Curl
+    }
 }
