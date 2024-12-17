@@ -63,9 +63,9 @@ kotlin {
             }
         }
         val jvmMain by getting {
-           dependencies{
-               api(libs.ktor.client.okhttp)
-           }
+            dependencies {
+                api(libs.ktor.client.okhttp)
+            }
         }
         val linuxX64Test by getting {
             dependencies {
@@ -106,7 +106,7 @@ android {
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-    signAllPublications()
+    //signAllPublications()
 
     coordinates(group.toString(), "library", version.toString())
 
@@ -151,4 +151,13 @@ project.tasks.withType(KotlinCompilationTask::class.java).configureEach {
     if (name != "kspCommonMainKotlinMetadata") {
         dependsOn("kspCommonMainKotlinMetadata")
     }
+}
+
+
+tasks.named("sourcesJar") {
+    dependsOn("kspCommonMainKotlinMetadata")
+}
+
+tasks.named("jvmSourcesJar") {
+    dependsOn("kspCommonMainKotlinMetadata")
 }

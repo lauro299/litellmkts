@@ -33,8 +33,8 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.mock.declare
-import org.litellmkt.handlers.params.HandlerParamsOllama
 import org.litellmkt.di.getLitellmktModule
+import org.litellmkt.params.BaseParamsModel
 
 class OllamaStreamHandlerTest : FunSpec(), KoinTest {
 
@@ -76,12 +76,12 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                     )
                 }
             }
-            val ollamaHandler: OllamaGenerateHandler by inject()
+            val ollamaHandler: OllamaGenerateGenerationHandler by inject()
             ollamaHandler.stream(
-                HandlerParamsOllama(
-                    model = "model",
-                    prompt = "prompt list",
-                )
+                BaseParamsModel().also {
+                    it["model"] = "model"
+                    it["prompt"] = "prompt list"
+                }
             ).collect()
         }
         test("ollama response in stream reading chunks by line") {
@@ -90,7 +90,7 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                     val writeChannel = ByteChannel()
                     respond(
                         content = writeChannel, status = HttpStatusCode.OK, headers =
-                        headersOf(name = HttpHeaders.TransferEncoding, value = "chunked")
+                            headersOf(name = HttpHeaders.TransferEncoding, value = "chunked")
                     ).also {
                         writeChannel.writeString("{\"model\":\"mistral\",\"created_at\":\"2024-11-07T05:15:34.422929565Z\",\"response\":\" Why\",\"done\":false}\n")
                         writeChannel.flush()
@@ -126,12 +126,13 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                     }
                 }
             }
-            val ollamaHandler: OllamaGenerateHandler by inject()
+            val ollamaHandler: OllamaGenerateGenerationHandler by inject()
             ollamaHandler.stream(
-                HandlerParamsOllama(
-                    model = "model",
-                    prompt = "prompt"
-                )
+                BaseParamsModel().also {
+                    it["model"] = "model"
+                    it["prompt"] = "prompt list"
+                }
+
             )
                 .collect {
                     println(it)
@@ -143,7 +144,7 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                     val writeChannel = ByteChannel()
                     respond(
                         content = writeChannel, status = HttpStatusCode.OK, headers =
-                        headersOf(name = HttpHeaders.TransferEncoding, value = "chunked")
+                            headersOf(name = HttpHeaders.TransferEncoding, value = "chunked")
                     ).also {
                         writeChannel.writeString("{\"model\":\"mistral\",\"created_at\":\"2024-11-07T05:15:34.422929565Z\",\"response\":\" Why\",\"done\":false}\n")
                         writeChannel.flush()
@@ -179,12 +180,12 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                     }
                 }
             }
-            val ollamaHandler: OllamaGenerateHandler by inject()
+            val ollamaHandler: OllamaGenerateGenerationHandler by inject()
             val reduced = ollamaHandler.stream(
-                HandlerParamsOllama(
-                    model = "model",
-                    prompt = "prompt",
-                )
+                BaseParamsModel().also {
+                    it["model"] = "model"
+                    it["prompt"] = "prompt"
+                }
             ).map { it.response }
                 .reduce { accumulator, value -> "$accumulator$value" }
             reduced.trim() shouldBe "Why don't scientists trust atoms? Because they make up everything!"
@@ -200,13 +201,13 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                     )
                 }
             }
-            val ollamaHandler: OllamaGenerateHandler by inject()
+            val ollamaHandler: OllamaGenerateGenerationHandler by inject()
             shouldThrow<Exception> {
                 ollamaHandler.stream(
-                    HandlerParamsOllama(
-                        model = "model",
-                        prompt = "prompt",
-                    )
+                    BaseParamsModel().also {
+                        it["model"] = "model"
+                        it["prompt"] = "prompt"
+                    }
                 ).map { it.response }
                     .catch {
                         throw it

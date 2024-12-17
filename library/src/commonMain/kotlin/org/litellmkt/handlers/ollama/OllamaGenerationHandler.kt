@@ -4,7 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.preparePost
 import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
+import io.ktor.http.ContentType.Application
 import io.ktor.http.contentType
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readUTF8Line
@@ -15,23 +15,23 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Singleton
-import org.litellmkt.handlers.HandlerGenerate
-import org.litellmkt.handlers.params.HandlerParamsOllama
-import org.litellmkt.handlers.results.HandlerResultOllama
+import org.litellmkt.handlers.GenerationHandler
+import org.litellmkt.params.BaseParamsModel
+import org.litellmkt.results.BaseResultModel
 
 @Singleton
-class OllamaGenerateHandler(
+class OllamaGenerateGenerationHandler(
     private val parser: Json,
     @Named("baseUrl") private val baseUrl: String,
     private val httpClient: HttpClient
-) : HandlerGenerate<HandlerParamsOllama, HandlerResultOllama> {
-    override fun stream(params: HandlerParamsOllama): Flow<HandlerResultOllama> {
+) : GenerationHandler {
+    override fun stream(params: BaseParamsModel): Flow<BaseResultModel> {
         return flow {
             httpClient.preparePost(
                 "${baseUrl}/api/generate"
             ) {
-                contentType(ContentType.Application.Json)
-                setBody(params)
+                contentType(Application.Json)
+                setBody(params.toOllamaGeneration())
             }.execute { httpResponse ->
                 val channel: ByteReadChannel = httpResponse.body()
                 while (!channel.isClosedForRead) {
@@ -43,109 +43,28 @@ class OllamaGenerateHandler(
                                 error(StreamError(error = error.message ?: ""))
                             }.getOrThrow()
                         }?.let {
-                            emit(it)
+                            emit(it.mapToBaseResultModel())
                         }
                 }
             }
         }
     }
+}
 
-    /*override fun embeddings(params: HandlerParamsOllama): Flow<Double> {
-        return flow<String> {
-            httpClient.preparePost(
-                "${baseUrl}/api/embeddings"
-            ) {
-                contentType(ContentType.Application.Json)
-                setBody(OllamaRequest(model = params.model, prompt = params.prompt))
-            }.execute { response: HttpResponse ->
-                var firsTime = true
-                val channel: ByteReadChannel = response.body()
-                while (!channel.isClosedForRead) {
-                    val packet = channel.readUTF8Line()
-                    var lastItem: String = ""
-                    if (!firsTime) {
-                        packet?.split(",")
-                            ?.let {
-                                val isConcatenated =
-                                    if (lastItem.isNotEmpty()) {
-                                        emit("$lastItem${it.first()}")
-                                        true
-                                    } else false
-                                lastItem = it.last()
-                                it.subList(takeIf { isConcatenated }?.let { 1 } ?: 0, it.size - 1)
-                            }?.let { subList ->
-                                emitAll(subList.asFlow())
-                            }
-                    } else {
-                        firsTime = false
-                        packet?.split("[")
-                            ?.last()
-                            ?.split(",")
-                            ?.let { list ->
-                                lastItem = list.last()
-                                emitAll(list.subList(0, list.size - 1).asFlow())
-                            }
-                    }
-                    if (lastItem.isNotEmpty()) {
-                        emit(lastItem)
-                    }
-                }
-            }
-        }.map { numberString ->
-            println(numberString)
-            if (!numberString.contains("]}")) {
-                numberString.toDouble()
-            } else {
-                numberString.removeSuffix("]}")
-                    .toDouble()
-            }
-        }
-    }*/
-
-    /*@OptIn(ExperimentalCoroutinesApi::class)
-    override fun embeddings(params: HandlerParamsBase): Flow<Double> {
-        return flow {
-            httpClient.preparePost(
-                "${params.baseUrl}/api/embeddings"
-            ) {
-                contentType(ContentType.Application.Json)
-                setBody(GenerateBody(model = params.model, prompt = combineMessages(params.messages)))
-            }.execute { response: HttpResponse ->
-                val channel: ByteReadChannel = response.body()
-                while (!channel.isClosedForRead){
-                    val packet = channel.readUTF8Line()
-                    emit(packet ?: "")
-                }
-            }
-        }.runningReduce{ accumulator, value ->
-            "$accumulator$value"
-        }.mapLatest {
-            runCatching {
-                EmbeddingsResult(
-                    embeddings = localJson.decodeFromString<OllamaEmbeddingsResult>(it).embedding
-                )
-            }.onFailure { throwable ->
-                error(throwable.message ?: "Error")
-            }.getOrThrow()
-        }
-    }*/
-
-    /*suspend fun getOllamaResponse(
-        model: String,
-        prompt: String,
-        baseUrl: String
-    ) {
-        httpClient.post("$baseUrl/api/generate") {
-            contentType(ContentType.Application.Json)
-            setBody(
-                OllamaRequest(
-                    model = model,
-                    prompt = prompt
-                )
-            )
-        }
-    }*/
-
+internal fun HandlerResultOllama.mapToBaseResultModel(): BaseResultModel {
+    return BaseResultModel(
+        model = model,
+        createdAt = createdAt,
+        response = response,
+        done = done,
+        totalDuration = totalDuration,
+        loadDuration = loadDuration,
+        promptEvalCount = promptEvalCount,
+        promptEvalDuration = promptEvalDuration,
+        evalCount = evalCount,
+        evalDuration = evalDuration,
+        context = context
+    )
 }
 
 fun OllamaStreamResponse.toStreamResult(): StreamResult {
@@ -290,3 +209,24 @@ data class EmbeddingsResult(
 )
 
 
+@Serializable
+data class HandlerResultOllama(
+    val model: String,
+    @SerialName("created_at")
+    val createdAt: String,
+    val response: String,
+    val done: Boolean,
+    @SerialName("total_duration") // Time spent generating the response
+    val totalDuration: Long? = -1, // Time spent generating the response
+    @SerialName("load_duration") // Time spent loading the model in nanoseconds
+    val loadDuration: Long? = -1, // Time spent loading the model in nanoseconds
+    @SerialName("prompt_eval_count") // Number of tokens in the prompt
+    val promptEvalCount: Int? = -1, // Number of tokens in the prompt
+    @SerialName("prompt_eval_duration") // Time spent evaluating the prompt in nanoseconds
+    val promptEvalDuration: Long? = -1, // Time spent evaluating the prompt in nanoseconds
+    @SerialName("eval_count") // Number of tokens in the response
+    val evalCount: Int? = -1, // Number of tokens in the response
+    @SerialName("eval_duration") // Time spent generating the response in nanoseconds
+    val evalDuration: Long? = -1, // Time spent generating the response in nanoseconds
+    val context: List<Int>? = null // Encoding of the conversation used in this response, that can be sent in the next request to keep a conversational memory
+)
