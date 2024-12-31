@@ -44,7 +44,7 @@ implementation("io.github.lauro299:litellmkts:0.0.3")
 }
 .....
 val chatHandler by inject<ChatHandler>()
-chat.chat(
+                    chatHandler.chat(
                         BaseParamsModel().also {
                             it["model"] = modelName
                             it["messages"] = _state.value.messages
