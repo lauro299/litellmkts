@@ -5,5 +5,4 @@ plugins {
     alias(libs.plugins.kspGoogle) apply false
     alias(libs.plugins.kotest) apply false
     alias(libs.plugins.kotlinSerialization) apply false
-    //alias(libs.plugins.mockactive) apply false
 }

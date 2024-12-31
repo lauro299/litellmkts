@@ -13,7 +13,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
-group = "io.github.kotlin"
+group = "io.litellmkts"
 version = "0.0.3"
 
 kotlin {
@@ -47,7 +47,6 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                //implementation(libs.kotlin.test)
                 implementation(libs.kotest.assertions.core)
                 implementation(libs.kotest.engine)
                 implementation(libs.kotest.extensions.koin)
@@ -96,7 +95,7 @@ kotlin {
 }
 
 android {
-    namespace = "org.jetbrains.kotlinx.multiplatform.library.template"
+    namespace = "io.litellmkts"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -111,8 +110,8 @@ mavenPublishing {
     coordinates(group.toString(), "library", version.toString())
 
     pom {
-        name = "My library"
-        description = "A library."
+        name = "litellmkts"
+        description = "A library for kotlin multiplatform use."
         inceptionYear = "2024"
         url = "https://github.com/kotlin/multiplatform-library-template/"
         licenses {
@@ -125,7 +124,7 @@ mavenPublishing {
         developers {
             developer {
                 id = "XXX"
-                name = "YYY"
+                name = "lau"
                 url = "ZZZ"
             }
         }
