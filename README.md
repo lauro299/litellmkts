@@ -14,8 +14,8 @@
 
 ### Using [Dependency Manager]
 
-```bash
-[command to install the library]
+```gradle
+implementation("io.github.lauro299:litellmkts:0.0.3")
 ```
 
 ### Manual
