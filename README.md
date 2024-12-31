@@ -14,8 +14,8 @@
 
 ### Using [Dependency Manager]
 
-```bash
-[command to install the library]
+```gradle
+implementation("io.github.lauro299:litellmkts:0.0.3")
 ```
 
 ### Manual
@@ -31,20 +31,18 @@
 ### Initial Setup
 
 ```kotlin
-
-```
-
-### Usage Example
-
-```kotlin
 //With koin
  single<ChatHandler> {
    val factory = get<HandlerFactory>()
    factory.createChatHandler("ollama")
 }
-.....
+```
+
+### Usage Example
+
+```kotlin
 val chatHandler by inject<ChatHandler>()
-chat.chat(
+                    chatHandler.chat(
                         BaseParamsModel().also {
                             it["model"] = modelName
                             it["messages"] = _state.value.messages
