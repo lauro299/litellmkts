@@ -17,5 +17,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "multiplatform-library-template"
-include(":library")
+include(":litellmkts")
 include("Example")

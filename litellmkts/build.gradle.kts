@@ -13,7 +13,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
-group = "io.litellmkts"
+group = "io.github.lauro299"
 version = "0.0.3"
 
 kotlin {
@@ -105,33 +105,29 @@ android {
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-    //signAllPublications()
+    signAllPublications()
 
-    coordinates(group.toString(), "library", version.toString())
+    coordinates(group.toString(), "litellmkts", version.toString())
 
     pom {
         name = "litellmkts"
         description = "A library for kotlin multiplatform use."
         inceptionYear = "2024"
-        url = "https://github.com/kotlin/multiplatform-library-template/"
+        url = "https://github.com/lauro299/litellmkts/"
         licenses {
             license {
-                name = "XXX"
-                url = "YYY"
-                distribution = "ZZZ"
+                name = "MIT"
+                url = "https://opensource.org/licenses/MIT"
             }
         }
         developers {
             developer {
-                id = "XXX"
+                id = "lauro299"
                 name = "lau"
-                url = "ZZZ"
             }
         }
         scm {
-            url = "XXX"
-            connection = "YYY"
-            developerConnection = "ZZZ"
+            url = "https://github.com/lauro299/litellmkts/"
         }
     }
 }

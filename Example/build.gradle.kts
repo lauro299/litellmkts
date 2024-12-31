@@ -15,7 +15,7 @@ repositories {
 dependencies {
     implementation(libs.koin.core)
     implementation(libs.kotlinx.coroutines.core)
-    implementation(project(":library"))
+    implementation(project(":litellmkts"))
 }
 
 tasks.test {
