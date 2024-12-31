@@ -10,12 +10,15 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.litellmkt.params.Message
 import org.litellmkt.di.getLitellmktModule
+import org.litellmkt.handlers.GenerationHandler
+import org.litellmkt.handlers.HandlerFactory
 import org.litellmkt.handlers.ollama.OllamaChatHandler
 import org.litellmkt.handlers.ollama.OllamaEmbeddingHandler
 import org.litellmkt.handlers.ollama.OllamaGenerateGenerationHandler
 import org.litellmkt.params.BaseParamsModel
 
 fun main() {
+    val instanceHandler = "ollama"
     val localKoin = startKoin {
         modules(
             getLitellmktModule(),
@@ -23,7 +26,8 @@ fun main() {
                 single(named("baseUrl")) { "http://localhost:11434" }
             })
     }
-    val ollamaHandler: OllamaGenerateGenerationHandler = localKoin.koin.get()
+    val handlerFactory:HandlerFactory = localKoin.koin.get()
+    val ollamaHandler: GenerationHandler = handlerFactory.createGenerationHandler(instanceHandler)
     runBlocking {
         ollamaHandler.stream(
             BaseParamsModel()
@@ -83,7 +87,7 @@ fun main() {
         }
     }
     runBlocking {
-        val ollamaChat = localKoin.koin.get<OllamaChatHandler>()
+        val ollamaChat = handlerFactory.createChatHandler(instanceHandler)
         ollamaChat.chat(
             params = BaseParamsModel().also {
                 it["model"] = "llama3.2"
@@ -97,7 +101,7 @@ fun main() {
     }
     runBlocking {
         println("running streaming chat")
-        val ollamaChat = localKoin.koin.get<OllamaChatHandler>()
+        val ollamaChat = handlerFactory.createChatHandler(instanceHandler)
         ollamaChat.chat(
             params = BaseParamsModel().also {
                 it["model"] = "llama3.2"
@@ -113,7 +117,7 @@ fun main() {
     }
 
     runBlocking {
-        val ollamaChat = localKoin.koin.get<OllamaChatHandler>()
+        val ollamaChat = handlerFactory.createChatHandler(instanceHandler)
         ollamaChat.chat(
             params = BaseParamsModel().also {
                 it["model"] = "llama3.2"
@@ -132,7 +136,7 @@ fun main() {
             .let(::println)
     }
     runBlocking {
-        val ollamaChat = localKoin.koin.get<OllamaChatHandler>()
+        val ollamaChat = handlerFactory.createChatHandler(instanceHandler)
         ollamaChat.chat(
             params = BaseParamsModel().also {
                 it["model"] = "llava"
@@ -153,7 +157,7 @@ fun main() {
             .let(::println)
     }
     runBlocking {
-        val ollamaEmbeddings = localKoin.koin.get<OllamaEmbeddingHandler>()
+        val ollamaEmbeddings = handlerFactory.createEmbeddingHandler(instanceHandler)
         ollamaEmbeddings.embeddings(
             params = BaseParamsModel().also {
                 it["model"] = "all-minilm"

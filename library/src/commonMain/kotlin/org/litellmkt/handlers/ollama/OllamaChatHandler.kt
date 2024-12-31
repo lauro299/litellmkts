@@ -13,17 +13,14 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.koin.core.annotation.Named
-import org.koin.core.annotation.Singleton
 import org.litellmkt.handlers.ChatHandler
 import org.litellmkt.params.BaseParamsModel
 import org.litellmkt.params.Message
 import org.litellmkt.results.BaseResultModel
 
-@Singleton
 class OllamaChatHandler(
     private val parser: Json,
-    @Named("baseUrl") private val baseUrl: String,
+    private val baseUrl: String,
     private val httpClient: HttpClient
 ) : ChatHandler {
     override fun chat(params: BaseParamsModel): Flow<BaseResultModel> {

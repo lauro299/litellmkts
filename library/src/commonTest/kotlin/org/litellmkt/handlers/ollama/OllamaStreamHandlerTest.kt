@@ -34,6 +34,8 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.mock.declare
 import org.litellmkt.di.getLitellmktModule
+import org.litellmkt.handlers.GenerationHandler
+import org.litellmkt.handlers.HandlerFactory
 import org.litellmkt.params.BaseParamsModel
 
 class OllamaStreamHandlerTest : FunSpec(), KoinTest {
@@ -76,7 +78,11 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                     )
                 }
             }
-            val ollamaHandler: OllamaGenerateGenerationHandler by inject()
+            declare<GenerationHandler> {
+                val handlerFactory:HandlerFactory by inject()
+                handlerFactory.createGenerationHandler("ollama")
+            }
+            val ollamaHandler: GenerationHandler by inject()
             ollamaHandler.stream(
                 BaseParamsModel().also {
                     it["model"] = "model"
@@ -126,7 +132,11 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                     }
                 }
             }
-            val ollamaHandler: OllamaGenerateGenerationHandler by inject()
+            declare<GenerationHandler> {
+                val handlerFactory:HandlerFactory by inject()
+                handlerFactory.createGenerationHandler("ollama")
+            }
+            val ollamaHandler: GenerationHandler by inject()
             ollamaHandler.stream(
                 BaseParamsModel().also {
                     it["model"] = "model"
@@ -180,7 +190,11 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                     }
                 }
             }
-            val ollamaHandler: OllamaGenerateGenerationHandler by inject()
+            declare<GenerationHandler> {
+                val handlerFactory:HandlerFactory by inject()
+                handlerFactory.createGenerationHandler("ollama")
+            }
+            val ollamaHandler: GenerationHandler by inject()
             val reduced = ollamaHandler.stream(
                 BaseParamsModel().also {
                     it["model"] = "model"
@@ -201,7 +215,11 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                     )
                 }
             }
-            val ollamaHandler: OllamaGenerateGenerationHandler by inject()
+            declare<GenerationHandler> {
+                val handlerFactory:HandlerFactory by inject()
+                handlerFactory.createGenerationHandler("ollama")
+            }
+            val ollamaHandler: GenerationHandler by inject()
             shouldThrow<Exception> {
                 ollamaHandler.stream(
                     BaseParamsModel().also {

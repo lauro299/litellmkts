@@ -10,15 +10,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
-import org.koin.core.annotation.Named
-import org.koin.core.annotation.Singleton
 import org.litellmkt.handlers.EmbeddingHandler
 import org.litellmkt.params.BaseParamsModel
 import org.litellmkt.results.BaseResultModel
 
-@Singleton
 class OllamaEmbeddingHandler(
-    @Named("baseUrl") private val baseUrl: String,
+    private val baseUrl: String,
     private val httpClient: HttpClient
 ) : EmbeddingHandler {
 

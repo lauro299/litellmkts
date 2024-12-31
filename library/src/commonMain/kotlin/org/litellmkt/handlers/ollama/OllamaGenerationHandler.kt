@@ -13,16 +13,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.koin.core.annotation.Named
-import org.koin.core.annotation.Singleton
 import org.litellmkt.handlers.GenerationHandler
 import org.litellmkt.params.BaseParamsModel
 import org.litellmkt.results.BaseResultModel
 
-@Singleton
 class OllamaGenerateGenerationHandler(
     private val parser: Json,
-    @Named("baseUrl") private val baseUrl: String,
+    private val baseUrl: String,
     private val httpClient: HttpClient
 ) : GenerationHandler {
     override fun stream(params: BaseParamsModel): Flow<BaseResultModel> {
