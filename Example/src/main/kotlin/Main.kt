@@ -23,7 +23,7 @@ fun main() {
         modules(
             getLitellmktModule(),
             module {
-                single(named("baseUrl")) { "http://localhost:11434" }
+                single(named("baseUrl")) { "http://192.168.100.42:11434" }
             })
     }
     val handlerFactory:HandlerFactory = localKoin.koin.get()
