@@ -28,6 +28,8 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+    macosX64()
+    macosArm64()
     linuxX64()
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs()
@@ -83,6 +85,41 @@ kotlin {
             }
         }
 
+        val macosArm64Main by getting {
+            dependencies {
+                dependsOn(commonMain)
+                implementation(libs.ktor.client.darwin)
+            }
+        }
+
+        val macosX64Main by getting{
+            dependencies{
+                dependsOn(commonMain)
+                implementation(libs.ktor.client.darwin)
+            }
+        }
+
+        val iosX64Main by getting {
+            dependencies{
+                dependsOn(commonMain)
+                implementation(libs.ktor.client.darwin)
+            }
+        }
+
+        val iosArm64Main by getting {
+            dependencies{
+                dependsOn(commonMain)
+                implementation(libs.ktor.client.darwin)
+            }
+        }
+
+        val iosSimulatorArm64Main by getting {
+            dependencies{
+                dependsOn(commonMain)
+                implementation(libs.ktor.client.darwin)
+            }
+        }
+
         val wasmJsMain by getting {
             dependencies {
                 implementation(libs.ktor.client.js)
@@ -105,7 +142,7 @@ android {
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-    signAllPublications()
+    //signAllPublications()
 
     coordinates(group.toString(), "litellmkts", version.toString())
 
@@ -135,8 +172,10 @@ mavenPublishing {
 dependencies {
     add("kspCommonMainMetadata", libs.koin.annotation.ksp)
     add("kspAndroid", libs.koin.annotation.ksp)
-    add("kspIosX64", libs.koin.annotation.ksp)
+    add("kspMacosArm64", libs.koin.annotation.ksp)
+    add("kspMacosX64", libs.koin.annotation.ksp)
     add("kspLinuxX64", libs.koin.annotation.ksp)
+    add("kspIosX64", libs.koin.annotation.ksp)
     add("kspIosArm64", libs.koin.annotation.ksp)
     add("kspIosSimulatorArm64", libs.koin.annotation.ksp)
     add("kspWasmJs", libs.koin.annotation.ksp)
