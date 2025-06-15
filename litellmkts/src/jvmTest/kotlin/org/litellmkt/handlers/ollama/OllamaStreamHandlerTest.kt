@@ -30,24 +30,33 @@ import kotlinx.coroutines.flow.reduce
 import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import org.koin.ksp.generated.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.mock.declare
+import org.litellmkt.di.HandlersModule
 import org.litellmkt.di.getLitellmktModule
 import org.litellmkt.handlers.GenerationHandler
 import org.litellmkt.handlers.HandlerFactory
 import org.litellmkt.params.BaseParamsModel
+import org.litellmkt.types.LLMProvider
 
 class OllamaStreamHandlerTest : FunSpec(), KoinTest {
 
     override fun extensions(): List<Extension> = listOf(
         KoinExtension(
             listOf(
-                getLitellmktModule(),
+                HandlersModule().module,
                 module {
+                    single {
+                        Json {
+                            ignoreUnknownKeys = true
+                        }
+                    }
                     single(named("baseUrl")) { "baseUrl" }
-                }
-            ),
+                },
+
+                ),
         )
     )
 
@@ -79,8 +88,8 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                 }
             }
             declare<GenerationHandler> {
-                val handlerFactory:HandlerFactory by inject()
-                handlerFactory.createGenerationHandler("ollama")
+                val handlerFactory: HandlerFactory by inject()
+                handlerFactory.createGenerationHandler(LLMProvider.Ollama)
             }
             val ollamaHandler: GenerationHandler by inject()
             ollamaHandler.stream(
@@ -133,8 +142,8 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                 }
             }
             declare<GenerationHandler> {
-                val handlerFactory:HandlerFactory by inject()
-                handlerFactory.createGenerationHandler("ollama")
+                val handlerFactory: HandlerFactory by inject()
+                handlerFactory.createGenerationHandler(LLMProvider.Ollama)
             }
             val ollamaHandler: GenerationHandler by inject()
             ollamaHandler.stream(
@@ -191,8 +200,8 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                 }
             }
             declare<GenerationHandler> {
-                val handlerFactory:HandlerFactory by inject()
-                handlerFactory.createGenerationHandler("ollama")
+                val handlerFactory: HandlerFactory by inject()
+                handlerFactory.createGenerationHandler(LLMProvider.Ollama)
             }
             val ollamaHandler: GenerationHandler by inject()
             val reduced = ollamaHandler.stream(
@@ -216,8 +225,8 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                 }
             }
             declare<GenerationHandler> {
-                val handlerFactory:HandlerFactory by inject()
-                handlerFactory.createGenerationHandler("ollama")
+                val handlerFactory: HandlerFactory by inject()
+                handlerFactory.createGenerationHandler(LLMProvider.Ollama)
             }
             val ollamaHandler: GenerationHandler by inject()
             shouldThrow<Exception> {

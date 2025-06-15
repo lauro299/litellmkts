@@ -1,4 +1,4 @@
-package org.litellmkt.di
+package org.litellmkt.network
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineFactory

@@ -14,15 +14,16 @@ plugins {
 }
 
 group = "io.github.lauro299"
-version = "0.0.3"
+version = "0.0.4-beta01"
 
 kotlin {
+    jvmToolchain(17)
     jvm()
     androidTarget {
         publishLibraryVariants("release")
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_1_8)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
     iosX64()
@@ -45,6 +46,7 @@ kotlin {
                 implementation(libs.ktor.serialization)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.ktor.client.logging)
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
             }
         }
         val commonTest by getting {
@@ -171,14 +173,15 @@ mavenPublishing {
 
 dependencies {
     add("kspCommonMainMetadata", libs.koin.annotation.ksp)
-    add("kspAndroid", libs.koin.annotation.ksp)
+    ksp(libs.koin.annotation.ksp)
+    /*add("kspAndroid", libs.koin.annotation.ksp)
     add("kspMacosArm64", libs.koin.annotation.ksp)
     add("kspMacosX64", libs.koin.annotation.ksp)
     add("kspLinuxX64", libs.koin.annotation.ksp)
     add("kspIosX64", libs.koin.annotation.ksp)
     add("kspIosArm64", libs.koin.annotation.ksp)
     add("kspIosSimulatorArm64", libs.koin.annotation.ksp)
-    add("kspWasmJs", libs.koin.annotation.ksp)
+    add("kspWasmJs", libs.koin.annotation.ksp)*/
 }
 
 project.tasks.withType(KotlinCompilationTask::class.java).configureEach {
