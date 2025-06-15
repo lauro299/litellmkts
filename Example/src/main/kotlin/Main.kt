@@ -16,9 +16,10 @@ import org.litellmkt.handlers.ollama.OllamaChatHandler
 import org.litellmkt.handlers.ollama.OllamaEmbeddingHandler
 import org.litellmkt.handlers.ollama.OllamaGenerateGenerationHandler
 import org.litellmkt.params.BaseParamsModel
+import org.litellmkt.types.LLMProvider
 
 fun main() {
-    val instanceHandler = "ollama"
+    val instanceHandler = LLMProvider.Ollama
     val localKoin = startKoin {
         modules(
             getLitellmktModule(),
@@ -27,12 +28,12 @@ fun main() {
             })
     }
     val handlerFactory:HandlerFactory = localKoin.koin.get()
-    val ollamaHandler: GenerationHandler = handlerFactory.createGenerationHandler(instanceHandler)
+    val ollamaHandler: GenerationHandler = handlerFactory.createGenerationHandler(LLMProvider.Ollama)
     runBlocking {
         ollamaHandler.stream(
             BaseParamsModel()
                 .also {
-                    it["model"] = "mistral"
+                    it["model"] = "qwen2.5"
                     it["prompt"] = "Tell me a short joke."
                     it["stream"] = false
                 }
@@ -41,9 +42,9 @@ fun main() {
         }.map { it.response }
             .reduce { accumulator, value -> "$accumulator$value" }
             .let(::println)
-        ollamaHandler.stream(
+        /*ollamaHandler.stream(
             BaseParamsModel().also {
-                it["model"] = "codellama:code"
+                it["model"] = "codestral"
                 it["prompt"] = "def compute_gcd(a,b):"
                 it["suffix"] = "       return result"
                 /*it["options"] = HandlerParamsOllamaOptions(
@@ -57,14 +58,13 @@ fun main() {
             }
         ).collectLatest {
             println(it)
-        }
+        }*/
         ollamaHandler.stream(
             BaseParamsModel().also {
-                it["model"] = "llama3.2"
+                it["model"] = "llama3.1"
                 it["prompt"] = "What color is the sky at different times of the day? Respond using JSON"
                 it["format"] = "json"
                 it["stream"] = false
-
             }
         ).collectLatest {
             println(it)
@@ -90,7 +90,7 @@ fun main() {
         val ollamaChat = handlerFactory.createChatHandler(instanceHandler)
         ollamaChat.chat(
             params = BaseParamsModel().also {
-                it["model"] = "llama3.2"
+                it["model"] = "llama3.1"
                 it["messages"] = listOf(
                     Message(role = "user", content = "Why is the sky blue?")
                 )
@@ -104,7 +104,7 @@ fun main() {
         val ollamaChat = handlerFactory.createChatHandler(instanceHandler)
         ollamaChat.chat(
             params = BaseParamsModel().also {
-                it["model"] = "llama3.2"
+                it["model"] = "llama3.1"
                 it["messages"] = listOf(
                     Message(role = "user", content = "Why is the sky blue?")
                 )
@@ -120,7 +120,7 @@ fun main() {
         val ollamaChat = handlerFactory.createChatHandler(instanceHandler)
         ollamaChat.chat(
             params = BaseParamsModel().also {
-                it["model"] = "llama3.2"
+                it["model"] = "llama3.1"
                 it["stream"] = false
                 it["messages"] = listOf(
                     Message(role = "user", content = "why is the sky blue?"),

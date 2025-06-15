@@ -1,14 +1,14 @@
 [versions]
-agp = "8.5.0"
+agp = "8.5.2"
 kotestAssertionsApiLinuxx64 = "5.9.1"
-kotlin = "2.0.20"
+kotlin = "2.1.0"
 android-minSdk = "24"
 android-compileSdk = "34"
 kotlinxSerializationJson = "1.7.3"
-ktor = "3.0.0"
+ktor = "3.0.3"
 coroutines = "1.9.0"
-koin = "4.0.0"
-koin-annotations = "2.0.0-Beta1"
+koin = "4.1.0-Beta5"
+koin-annotations = "2.0.0"
 kotest = "6.0.0.M1"
 statelyCommonLinuxx64 = "2.1.0"
 
@@ -43,7 +43,7 @@ stately-common-linuxx64 = { module = "co.touchlab:stately-common-linuxx64", vers
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.29.0" }
-kspGoogle = { id = "com.google.devtools.ksp", version = "2.0.20-1.0.25" }
+kspGoogle = { id = "com.google.devtools.ksp", version = "2.1.0-1.0.29" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 mockative = { id = "io.mockative", version = "3.0.0" }
-kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = "2.0.20" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = "2.1.0" }
