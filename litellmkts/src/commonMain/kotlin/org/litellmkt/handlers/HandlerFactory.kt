@@ -7,6 +7,7 @@ import org.koin.core.annotation.Singleton
 import org.litellmkt.handlers.ollama.OllamaChatHandler
 import org.litellmkt.handlers.ollama.OllamaEmbeddingHandler
 import org.litellmkt.handlers.ollama.OllamaGenerateGenerationHandler
+import org.litellmkt.handlers.ollama.OllamaModelsHandler
 import org.litellmkt.handlers.openAi.OpenAiChatHandler
 import org.litellmkt.handlers.openAi.OpenAiEmbeddingHandler
 import org.litellmkt.handlers.openAi.OpenAiGenerationHandler
@@ -27,7 +28,7 @@ class HandlerFactory(
     fun createChatHandler(instance: String): ChatHandler {
         return createChatHandler(parseProvider(instance))
     }
-    
+
     fun createChatHandler(provider: LLMProvider): ChatHandler {
         return when (provider) {
             is LLMProvider.Ollama -> OllamaChatHandler(
@@ -35,12 +36,14 @@ class HandlerFactory(
                 baseUrl = baseUrl,
                 httpClient = httpClient
             )
+
             is LLMProvider.OpenAI -> OpenAiChatHandler(
                 parser = parser,
                 baseUrl = baseUrl,
                 httpClient = httpClient,
                 apiKey = apiKey ?: throw IllegalArgumentException("API key required for OpenAI")
             )
+
             is LLMProvider.Custom -> throw IllegalArgumentException("Custom provider not yet supported: ${provider.name}")
         }
     }
@@ -48,18 +51,20 @@ class HandlerFactory(
     fun createEmbeddingHandler(instance: String): EmbeddingHandler {
         return createEmbeddingHandler(parseProvider(instance))
     }
-    
+
     fun createEmbeddingHandler(provider: LLMProvider): EmbeddingHandler {
         return when (provider) {
             is LLMProvider.Ollama -> OllamaEmbeddingHandler(
                 baseUrl = baseUrl,
                 httpClient = httpClient
             )
+
             is LLMProvider.OpenAI -> OpenAiEmbeddingHandler(
                 baseUrl = baseUrl,
                 httpClient = httpClient,
                 apiKey = apiKey ?: throw IllegalArgumentException("API key required for OpenAI")
             )
+
             is LLMProvider.Custom -> throw IllegalArgumentException("Custom provider not yet supported: ${provider.name}")
         }
     }
@@ -67,7 +72,7 @@ class HandlerFactory(
     fun createGenerationHandler(instance: String): GenerationHandler {
         return createGenerationHandler(parseProvider(instance))
     }
-    
+
     fun createGenerationHandler(provider: LLMProvider): GenerationHandler {
         return when (provider) {
             is LLMProvider.Ollama -> OllamaGenerateGenerationHandler(
@@ -75,16 +80,34 @@ class HandlerFactory(
                 baseUrl = baseUrl,
                 httpClient = httpClient
             )
+
             is LLMProvider.OpenAI -> OpenAiGenerationHandler(
                 parser = parser,
                 baseUrl = baseUrl,
                 httpClient = httpClient,
                 apiKey = apiKey ?: throw IllegalArgumentException("API key required for OpenAI")
             )
+
             is LLMProvider.Custom -> throw IllegalArgumentException("Custom provider not yet supported: ${provider.name}")
         }
     }
-    
+
+    fun createModelsHandler(instance: String): ModelsHandler {
+        return createModelsHandler(provider = parseProvider(instance))
+    }
+
+    fun createModelsHandler(provider: LLMProvider): ModelsHandler {
+        return when (provider) {
+            is LLMProvider.Ollama -> OllamaModelsHandler(
+                baseUrl = baseUrl,
+                httpClient = httpClient,
+                parser = parser,
+            )
+            is LLMProvider.OpenAI -> throw IllegalArgumentException("API key required for OpenAI")
+            is LLMProvider.Custom -> throw IllegalArgumentException("Custom provider not yet supported: ${provider.name}")
+        }
+    }
+
     private fun parseProvider(instance: String): LLMProvider {
         return when (instance.lowercase()) {
             "ollama" -> LLMProvider.Ollama

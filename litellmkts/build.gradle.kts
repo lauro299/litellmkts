@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "io.github.lauro299"
-version = "0.0.4-beta01"
+version = "0.0.5-beta01"
 
 kotlin {
     jvmToolchain(17)
