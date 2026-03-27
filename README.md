@@ -89,5 +89,5 @@ For questions or suggestions, please contact:
 
 - **Author:** lauro299
 - **Email:** [youremail@example.com]
-- **GitHub:** [https://github.com/lauro299](https://github.com/user)
+- **GitHub:** [https://github.com/lauro299](https://github.com/lauro299)
 
