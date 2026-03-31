@@ -5,6 +5,7 @@ import org.litellmkt.types.ChatMessage
 import org.litellmkt.types.FinishReason
 import org.litellmkt.types.PerformanceMetrics
 import org.litellmkt.types.TokenUsage
+import kotlin.time.Clock
 
 /**
  * Enhanced chat response with comprehensive information
@@ -21,7 +22,7 @@ data class ChatResponse(
     val metadata: Map<String, String> = emptyMap(),
     val isStreaming: Boolean = false,
     val isDone: Boolean = false,
-    val createdAt: Long = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+    val createdAt: Long = Clock.System.now().toEpochMilliseconds()
 )
 
 /**
@@ -38,7 +39,7 @@ data class CompletionResponse(
     val metadata: Map<String, String> = emptyMap(),
     val isStreaming: Boolean = false,
     val isDone: Boolean = false,
-    val createdAt: Long = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+    val createdAt: Long = Clock.System.now().toEpochMilliseconds()
 )
 
 /**
@@ -52,7 +53,7 @@ data class EmbeddingResponse(
     val usage: TokenUsage? = null,
     val performance: PerformanceMetrics? = null,
     val metadata: Map<String, String> = emptyMap(),
-    val createdAt: Long = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+    val createdAt: Long = Clock.System.now().toEpochMilliseconds()
 )
 
 /**
@@ -64,7 +65,7 @@ data class ApiResponse<T>(
     val data: T? = null,
     val error: ApiError? = null,
     val requestId: String? = null,
-    val timestamp: Long = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+    val timestamp: Long = Clock.System.now().toEpochMilliseconds()
 )
 
 /**

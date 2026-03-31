@@ -17,6 +17,10 @@ sealed class LLMProvider {
     }
     
     data class Custom(override val name: String) : LLMProvider()
+
+    data class Local(val modelPath: String) : LLMProvider() {
+        override val name: String = "local"
+    }
 }
 
 /**

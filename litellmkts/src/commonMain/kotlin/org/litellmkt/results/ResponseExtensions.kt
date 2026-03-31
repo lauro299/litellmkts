@@ -6,6 +6,7 @@ import org.litellmkt.types.MessageRole
 import org.litellmkt.types.PerformanceMetrics
 import org.litellmkt.types.TokenUsage
 import kotlin.random.Random
+import kotlin.time.Clock
 
 /**
  * Extension functions to convert BaseResultModel to enhanced response models
@@ -103,10 +104,10 @@ private fun BaseResultModel.parseCreatedAt(): Long {
         if (createdAt.isNotEmpty() && createdAt.toLongOrNull() != null) {
             createdAt.toLong()
         } else {
-            kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+            Clock.System.now().toEpochMilliseconds()
         }
     } catch (e: Exception) {
-        kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+        Clock.System.now().toEpochMilliseconds()
     }
 }
 
