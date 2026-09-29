@@ -1,9 +1,5 @@
 # litellmkts
 
-## Description
-
-**litellmkts** is a wrapper for the ollama REST API that enables its use in cross-platform projects. This project simplifies API integration and management, offering a consistent and developer-friendly interface.
-
 ## Features
 
 - **Cross-platform**: Supports Android, iOS (arm64, x64, simulator), JVM/Desktop, Linux, macOS (arm64, x64), and WebAssembly (Wasm/JS) — full Kotlin Multiplatform target coverage.
