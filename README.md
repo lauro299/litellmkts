@@ -6,7 +6,7 @@
 
 ## Features
 
-- **Cross-platform:** Compatible with projects on [supported platforms, e.g., Android, iOS, Web].
+- **Cross-platform: Supports Android, iOS (arm64, x64, simulator), JVM/Desktop, Linux, macOS (arm64, x64), and WebAssembly (Wasm/JS) — full Kotlin Multiplatform target coverage.
 - **Easy to use:** Designed to streamline communication with the REST API.
 - **Extensible:** Modular structure allowing customizations as per project needs.
 
