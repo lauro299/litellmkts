@@ -172,3 +172,11 @@ fun main() {
     }
     println("Hello World!")
 }
+
+/** Prints the models available on the configured server. */
+suspend fun printModels(handlerFactory: HandlerFactory) {
+    val modelsHandler = handlerFactory.createModelsHandler(LLMProvider.Ollama) // or LLMProvider.OpenAI (needs apiKey)
+
+    modelsHandler.listModels()
+        .collect { model -> println("${model.name} ${model.details?.parameterSize ?: ""}") }
+}

@@ -7,9 +7,11 @@ import org.koin.core.annotation.Single
 import org.litellmkt.handlers.ollama.OllamaChatHandler
 import org.litellmkt.handlers.ollama.OllamaEmbeddingHandler
 import org.litellmkt.handlers.ollama.OllamaGenerateGenerationHandler
+import org.litellmkt.handlers.ollama.OllamaModelsHandler
 import org.litellmkt.handlers.openAi.OpenAiChatHandler
 import org.litellmkt.handlers.openAi.OpenAiEmbeddingHandler
 import org.litellmkt.handlers.openAi.OpenAiGenerationHandler
+import org.litellmkt.handlers.openAi.OpenAiModelsHandler
 import org.litellmkt.types.LLMProvider
 
 /**
@@ -87,6 +89,27 @@ class HandlerFactory(
         }
     }
     
+    fun createModelsHandler(instance: String): ModelsHandler {
+        return createModelsHandler(parseProvider(instance))
+    }
+
+    fun createModelsHandler(provider: LLMProvider): ModelsHandler {
+        return when (provider) {
+            is LLMProvider.Ollama -> OllamaModelsHandler(
+                parser = parser,
+                baseUrl = baseUrl,
+                httpClient = httpClient
+            )
+            is LLMProvider.OpenAI -> OpenAiModelsHandler(
+                parser = parser,
+                baseUrl = baseUrl,
+                httpClient = httpClient,
+                apiKey = apiKey ?: throw IllegalArgumentException("API key required for OpenAI")
+            )
+            is LLMProvider.Custom -> throw IllegalArgumentException("Custom provider not yet supported: ${provider.name}")
+        }
+    }
+
     private fun parseProvider(instance: String): LLMProvider {
         return when (instance.lowercase()) {
             "ollama" -> LLMProvider.Ollama
