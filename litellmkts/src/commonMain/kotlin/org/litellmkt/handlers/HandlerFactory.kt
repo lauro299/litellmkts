@@ -52,10 +52,12 @@ class HandlerFactory(
     fun createEmbeddingHandler(provider: LLMProvider): EmbeddingHandler {
         return when (provider) {
             is LLMProvider.Ollama -> OllamaEmbeddingHandler(
+                parser = parser,
                 baseUrl = baseUrl,
                 httpClient = httpClient
             )
             is LLMProvider.OpenAI -> OpenAiEmbeddingHandler(
+                parser = parser,
                 baseUrl = baseUrl,
                 httpClient = httpClient,
                 apiKey = apiKey ?: throw IllegalArgumentException("API key required for OpenAI")

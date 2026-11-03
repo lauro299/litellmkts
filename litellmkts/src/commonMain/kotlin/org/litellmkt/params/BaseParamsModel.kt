@@ -30,6 +30,6 @@ data class Message(
 )
 
 class BaseParamsModel : Model, Stream, MutableMap<String, Any> by HashMap() {
-    override val model: String? by lazy { get("model") as String? }
-    override val stream: Boolean? by lazy { get("stream") as Boolean? }
+    override val model: String? get() = get("model") as? String
+    override val stream: Boolean? get() = get("stream") as? Boolean
 }

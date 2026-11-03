@@ -34,6 +34,7 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.mock.declare
 import org.litellmkt.di.HandlersModule
+import org.litellmkt.errors.ProviderHttpException
 import org.litellmkt.di.getLitellmktModule
 import org.litellmkt.handlers.GenerationHandler
 import org.litellmkt.handlers.HandlerFactory
@@ -229,7 +230,7 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                 handlerFactory.createGenerationHandler(LLMProvider.Ollama)
             }
             val ollamaHandler: GenerationHandler by inject()
-            shouldThrow<Exception> {
+            shouldThrow<ProviderHttpException> {
                 ollamaHandler.stream(
                     BaseParamsModel().also {
                         it["model"] = "model"

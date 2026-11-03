@@ -23,7 +23,7 @@ A **Kotlin Multiplatform** library that wraps the [Ollama](https://ollama.com) R
 ### Gradle
 
 ```kotlin
-implementation("io.github.lauro299:litellmkts:0.0.3")
+implementation("io.github.lauro299:litellmkts:0.1.0-beta01")
 ```
 
 ### Manual
@@ -62,6 +62,72 @@ chatHandler.chat(
 ```
 
 Responses stream back as a `Flow`, so you can render tokens as they arrive.
+
+### Configuring the transport
+
+Declare an optional `LitellmktConfig` in your Koin module to tune timeouts and logging:
+
+```kotlin
+startKoin {
+    modules(
+        getLitellmktModule(),
+        module {
+            single(named("baseUrl")) { "http://localhost:11434" }
+            single { LitellmktConfig(socketTimeoutMillis = 60_000, logLevel = LogLevel.HEADERS) }
+        }
+    )
+}
+```
+
+| Setting | Default | Notes |
+| --- | --- | --- |
+| `connectTimeoutMillis` | 30 s | Time to establish the connection. |
+| `socketTimeoutMillis` | 120 s | Maximum inactivity between two packets. Not supported by the Js engine. |
+| `logLevel` | `LogLevel.NONE` | The `Authorization` header is always masked. |
+| `logger` | `Logger.SIMPLE` | Destination of the HTTP logs. |
+
+There is no total request timeout, so long generations are never cut off while tokens keep arriving. To bound a call,
+cancel the collecting coroutine or wrap it in `withTimeout`.
+
+### Handling errors
+
+Every provider, HTTP and parsing failure ends the flow with a `LiteLlmException`:
+
+```kotlin
+chatHandler.chat(params)
+    .catch { error ->
+        when (error) {
+            is ProviderHttpException -> println("HTTP ${error.status}: ${error.providerMessage}")
+            is ProviderStreamException -> println("Provider error: ${error.providerMessage}")
+            is ResponseParseException -> println("Unexpected response: ${error.cause}")
+            else -> throw error
+        }
+    }
+```
+
+Invalid parameters (missing `model`, a non-numeric `temperature`, …) fail with `IllegalArgumentException` before any
+request is sent. Numeric parameters accept any `Number` (`Int`, `Long`, `Float`, `Double`).
+
+## Migrating to 0.1.0
+
+- **Errors:** flows used to fail with `IllegalStateException("StreamError(...)")`, or completed empty on HTTP errors. They now
+  fail with `LiteLlmException` (`ProviderHttpException`, `ProviderStreamException`, `ResponseParseException`) in
+  `org.litellmkt.errors`.
+- **Metrics:** missing metrics in `BaseResultModel` (`totalDuration`, `evalCount`, …) are now `null` instead of `-1`.
+- **Embedding handlers:** `OllamaEmbeddingHandler` and `OpenAiEmbeddingHandler` now take a `parser: Json` as first
+  constructor argument (`HandlerFactory` callers are unaffected).
+- **Roles:** `MessageRole.TOOL` was added; unknown roles map to `ASSISTANT` and are kept in
+  `ChatResponse.metadata["original_role"]`.
+- **Removed public types** (they were unused by the handlers):
+
+  | Removed | Replacement |
+  | --- | --- |
+  | `StreamError`, `OllamaError`, `toStreamError()` | `LiteLlmException` subtypes |
+  | `OllamaCompletionResponse`, `Choice`, `Usage`, `OllamaStreamResponse`, `toStreamResult()`, `StreamResult`, `CompletionResult` | `BaseResultModel` / `CompletionResponse` |
+  | `OllamaEmbeddingsResult`, `EmbeddingsResult`, `HandlerResultOllamaEmbeddings` | `BaseResultModel.embeddings` / `EmbeddingResponse` |
+  | `HandlerResultOllama`, `HandlerOllamaResultChatModel` | `BaseResultModel` |
+  | `HandlerResultModel`, `HandlerEmbeddingsParamsModel`, `HandlerResultEmbeddingsModel` | `BaseResultModel` / `BaseParamsModel` |
+  | `Features` | `LLMProvider` and the handler interfaces |
 
 ## Architecture
 

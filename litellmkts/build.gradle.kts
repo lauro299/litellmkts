@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "io.github.lauro299"
-version = "0.0.4-beta01"
+version = "0.1.0-beta01"
 
 kotlin {
     jvm {
@@ -46,7 +46,7 @@ kotlin {
             implementation(libs.ktor.contentNegotiation)
             implementation(libs.ktor.serialization)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.ktor.client.logging)
+            api(libs.ktor.client.logging)
             implementation(libs.kotlinx.datetime)
         }
         commonTest.dependencies {
