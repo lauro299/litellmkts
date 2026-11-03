@@ -1,15 +1,17 @@
 [versions]
-agp = "8.5.2"
+agp = "9.5.0"
 kotestAssertionsApiLinuxx64 = "5.9.1"
-kotlin = "2.1.0"
+kotlin = "2.4.21"
 android-minSdk = "24"
 android-compileSdk = "34"
 kotlinxSerializationJson = "1.7.3"
 ktor = "3.0.3"
 coroutines = "1.9.0"
-koin = "4.1.0-Beta5"
-koin-annotations = "2.0.0"
-kotest = "6.0.0.M1"
+koin = "4.1.1"
+koin-annotations = "2.3.1"
+kotest = "6.2.6"
+ksp = "2.3.13"
+kotlinxDatetime = "0.6.2"
 statelyCommonLinuxx64 = "2.1.0"
 
 [libraries]
@@ -36,14 +38,15 @@ koin-annotation-ksp = { module = "io.insert-koin:koin-ksp-compiler", version.ref
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
-kotest-extensions-koin = { module = "io.kotest.extensions:kotest-extensions-koin", version = "1.3.0" }
+kotest-extensions-koin = { module = "io.kotest:kotest-extensions-koin", version.ref = "kotest" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 stately-common-linuxx64 = { module = "co.touchlab:stately-common-linuxx64", version.ref = "statelyCommonLinuxx64" }
 
 [plugins]
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.29.0" }
-kspGoogle = { id = "com.google.devtools.ksp", version = "2.1.0-1.0.29" }
-kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
+vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.37.0" }
+kspGoogle = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotest = { id = "io.kotest", version.ref = "kotest" }
 mockative = { id = "io.mockative", version = "3.0.0" }
-kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = "2.1.0" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

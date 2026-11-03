@@ -1,12 +1,10 @@
-import com.vanniktech.maven.publish.SonatypeHost
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.kspGoogle)
     alias(libs.plugins.kotest)
@@ -17,11 +15,15 @@ group = "io.github.lauro299"
 version = "0.0.4-beta01"
 
 kotlin {
-    jvmToolchain(17)
-    jvm()
-    androidTarget {
-        publishLibraryVariants("release")
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    jvm {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
+    android {
+        namespace = "io.litellmkts"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
@@ -46,14 +48,13 @@ kotlin {
                 implementation(libs.ktor.serialization)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.ktor.client.logging)
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+                implementation(libs.kotlinx.datetime)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotest.assertions.core)
                 implementation(libs.kotest.engine)
-                implementation(libs.kotest.extensions.koin)
                 implementation(libs.koin.test)
                 implementation(libs.ktor.client.mock)
                 implementation(libs.ktor.contentNegotiation)
@@ -63,6 +64,7 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(libs.kotest.runner.junit5)
+                implementation(libs.kotest.extensions.koin)
             }
         }
         val jvmMain by getting {
@@ -133,16 +135,13 @@ kotlin {
     }
 }
 
-android {
-    namespace = "io.litellmkts"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
+// Compile with whatever JDK runs Gradle (e.g. Java 27) but keep emitting Java 17 bytecode.
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(17)
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
 
     //signAllPublications()
 
