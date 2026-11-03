@@ -108,6 +108,20 @@ chatHandler.chat(params)
 Invalid parameters (missing `model`, a non-numeric `temperature`, …) fail with `IllegalArgumentException` before any
 request is sent. Numeric parameters accept any `Number` (`Int`, `Long`, `Float`, `Double`).
 
+### Listing available models
+
+```kotlin
+val modelsHandler = handlerFactory.createModelsHandler(LLMProvider.Ollama) // or LLMProvider.OpenAI (needs apiKey)
+
+modelsHandler.listModels()
+    .collect { model -> println("${model.name} ${model.details?.parameterSize ?: ""}") }
+```
+
+Each `ModelInfo` always has a `name`; the other fields are `null` when the provider does not report them. Ollama
+(`/api/tags`) fills `model`, `modifiedAt`, `size`, `digest` and `details`; OpenAI (`/v1/models`) fills `modifiedAt`
+(creation date) and `ownedBy`. OpenAI returns every model of the account, including embedding and audio models, so
+filter the list if you only need chat models.
+
 ## Migrating to 0.1.0
 
 - **Errors:** flows used to fail with `IllegalStateException("StreamError(...)")`, or completed empty on HTTP errors. They now
