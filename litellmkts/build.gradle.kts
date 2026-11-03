@@ -38,101 +38,57 @@ kotlin {
     wasmJs()
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(libs.ktor.client.core)
-                implementation(libs.koin.core)
-                api(libs.koin.annotation)
-                implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.ktor.contentNegotiation)
-                implementation(libs.ktor.serialization)
-                implementation(libs.kotlinx.serialization.json)
-                implementation(libs.ktor.client.logging)
-                implementation(libs.kotlinx.datetime)
-            }
+        commonMain.dependencies {
+            implementation(libs.ktor.client.core)
+            implementation(libs.koin.core)
+            api(libs.koin.annotation)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.ktor.contentNegotiation)
+            implementation(libs.ktor.serialization)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.kotlinx.datetime)
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(libs.kotest.assertions.core)
-                implementation(libs.kotest.engine)
-                implementation(libs.koin.test)
-                implementation(libs.ktor.client.mock)
-                implementation(libs.ktor.contentNegotiation)
-                implementation(libs.ktor.serialization)
-            }
+        commonTest.dependencies {
+            implementation(libs.kotest.assertions.core)
+            implementation(libs.kotest.engine)
+            implementation(libs.koin.test)
+            implementation(libs.ktor.client.mock)
+            implementation(libs.ktor.contentNegotiation)
+            implementation(libs.ktor.serialization)
         }
-        val jvmTest by getting {
-            dependencies {
-                implementation(libs.kotest.runner.junit5)
-                implementation(libs.kotest.extensions.koin)
-            }
+        jvmTest.dependencies {
+            implementation(libs.kotest.runner.junit5)
+            implementation(libs.kotest.extensions.koin)
         }
-        val jvmMain by getting {
-            dependencies {
-                api(libs.ktor.client.okhttp)
-            }
+        jvmMain.dependencies {
+            api(libs.ktor.client.okhttp)
         }
-        val linuxX64Test by getting {
-            dependencies {
-                implementation(libs.stately.common.linuxx64)
-                implementation(libs.kotest.assertions.api.linuxx64)
-            }
+        linuxX64Test.dependencies {
+            implementation(libs.stately.common.linuxx64)
+            implementation(libs.kotest.assertions.api.linuxx64)
         }
-        val androidMain by getting {
-            dependencies {
-                implementation(libs.ktor.client.android)
-            }
+        androidMain.dependencies {
+            implementation(libs.ktor.client.android)
         }
-        val linuxX64Main by getting {
-            dependencies {
-                implementation(libs.ktor.client.curl)
-            }
+        linuxX64Main.dependencies {
+            implementation(libs.ktor.client.curl)
         }
-
-        val macosArm64Main by getting {
-            dependencies {
-                dependsOn(commonMain)
-                implementation(libs.ktor.client.darwin)
-            }
+        // iOS and macOS targets via the default hierarchy template
+        appleMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
-
-        val macosX64Main by getting{
-            dependencies{
-                dependsOn(commonMain)
-                implementation(libs.ktor.client.darwin)
-            }
-        }
-
-        val iosX64Main by getting {
-            dependencies{
-                dependsOn(commonMain)
-                implementation(libs.ktor.client.darwin)
-            }
-        }
-
-        val iosArm64Main by getting {
-            dependencies{
-                dependsOn(commonMain)
-                implementation(libs.ktor.client.darwin)
-            }
-        }
-
-        val iosSimulatorArm64Main by getting {
-            dependencies{
-                dependsOn(commonMain)
-                implementation(libs.ktor.client.darwin)
-            }
-        }
-
-        val wasmJsMain by getting {
-            dependencies {
-                implementation(libs.ktor.client.js)
-            }
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
         }
     }
     sourceSets.named("commonMain").configure {
         kotlin.srcDirs("build/generated/ksp/metadata/commonMain/kotlin")
     }
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 
 // Compile with whatever JDK runs Gradle (e.g. Java 27) but keep emitting Java 17 bytecode.
@@ -172,7 +128,6 @@ mavenPublishing {
 
 dependencies {
     add("kspCommonMainMetadata", libs.koin.annotation.ksp)
-    ksp(libs.koin.annotation.ksp)
     /*add("kspAndroid", libs.koin.annotation.ksp)
     add("kspMacosArm64", libs.koin.annotation.ksp)
     add("kspMacosX64", libs.koin.annotation.ksp)
@@ -181,6 +136,11 @@ dependencies {
     add("kspIosArm64", libs.koin.annotation.ksp)
     add("kspIosSimulatorArm64", libs.koin.annotation.ksp)
     add("kspWasmJs", libs.koin.annotation.ksp)*/
+}
+
+// Target-specific KSP tasks read the Koin code generated for commonMain
+project.tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
+    dependsOn("kspCommonMainKotlinMetadata")
 }
 
 project.tasks.withType(KotlinCompilationTask::class.java).configureEach {

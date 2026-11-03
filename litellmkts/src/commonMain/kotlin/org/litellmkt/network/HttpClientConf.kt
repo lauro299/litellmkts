@@ -10,9 +10,9 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import org.koin.core.annotation.Singleton
+import org.koin.core.annotation.Single
 
-@Singleton
+@Single
 fun HttpClientConf(
     engine: HttpClientLocalEngine
 ): HttpClient = HttpClient(engine()) {
@@ -32,7 +32,7 @@ fun HttpClientConf(
     }
 }
 
-@Singleton
+@Single
 internal fun jsonParser() = Json {
     ignoreUnknownKeys = true
 }
@@ -41,7 +41,7 @@ interface HttpClientLocalEngine {
     operator fun invoke(): HttpClientEngineFactory<*>
 }
 
-@Singleton(binds = [HttpClientLocalEngine::class])
+@Single(binds = [HttpClientLocalEngine::class])
 internal fun getDeviceEngineFactory(): HttpClientLocalEngine {
     return getActualDeviceEngine()
 }

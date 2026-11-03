@@ -1,7 +1,6 @@
 package org.litellmkt.handlers.ollama
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.koin.KoinExtension
 import io.kotest.matchers.shouldBe
@@ -43,22 +42,23 @@ import org.litellmkt.types.LLMProvider
 
 class OllamaStreamHandlerTest : FunSpec(), KoinTest {
 
-    override fun extensions(): List<Extension> = listOf(
-        KoinExtension(
-            listOf(
-                HandlersModule().module,
-                module {
-                    single {
-                        Json {
-                            ignoreUnknownKeys = true
+    init {
+        extension(
+            KoinExtension(
+                listOf(
+                    HandlersModule().module,
+                    module {
+                        single {
+                            Json {
+                                ignoreUnknownKeys = true
+                            }
                         }
-                    }
-                    single(named("baseUrl")) { "baseUrl" }
-                },
-
+                        single(named("baseUrl")) { "baseUrl" }
+                    },
                 ),
+            )
         )
-    )
+    }
 
     val createHttpClient: (suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData) -> HttpClient =
         { body: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData ->

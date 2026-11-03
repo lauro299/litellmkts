@@ -3,7 +3,7 @@ package org.litellmkt.handlers
 import io.ktor.client.HttpClient
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Named
-import org.koin.core.annotation.Singleton
+import org.koin.core.annotation.Single
 import org.litellmkt.handlers.ollama.OllamaChatHandler
 import org.litellmkt.handlers.ollama.OllamaEmbeddingHandler
 import org.litellmkt.handlers.ollama.OllamaGenerateGenerationHandler
@@ -17,7 +17,7 @@ import org.litellmkt.types.LLMProvider
  *instance string. It has three methods for creating chat, embedding, and generation handlers. The factory uses
  *dependency injection to provide the required dependencies to the handler constructors.
  */
-@Singleton
+@Single
 class HandlerFactory(
     private val parser: Json,
     @Named("baseUrl") private val baseUrl: String,
