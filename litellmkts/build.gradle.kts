@@ -99,7 +99,7 @@ tasks.withType<JavaCompile>().configureEach {
 mavenPublishing {
     publishToMavenCentral()
 
-    //signAllPublications()
+    signAllPublications()
 
     coordinates(group.toString(), "litellmkts", version.toString())
 
