@@ -5,19 +5,30 @@ import io.ktor.client.call.body
 import io.ktor.client.request.header
 import io.ktor.client.request.preparePost
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType.Application
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readUTF8Line
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.litellmkt.handlers.ChatHandler
+import org.litellmkt.handlers.internal.decodeProviderChunk
+import org.litellmkt.handlers.internal.ensureSuccess
+import org.litellmkt.handlers.internal.forEachLine
+import org.litellmkt.handlers.internal.sseData
 import org.litellmkt.params.BaseParamsModel
 import org.litellmkt.params.Message
+import org.litellmkt.params.boolean
+import org.litellmkt.params.double
+import org.litellmkt.params.int
+import org.litellmkt.params.messages
+import org.litellmkt.params.requireModel
+import org.litellmkt.params.string
+import org.litellmkt.params.stringList
 import org.litellmkt.results.BaseResultModel
 
 class OpenAiChatHandler(
@@ -28,42 +39,45 @@ class OpenAiChatHandler(
 ) : ChatHandler {
     override fun chat(params: BaseParamsModel): Flow<BaseResultModel> {
         return flow {
+            val request = params.toOpenAiChat()
             httpClient.preparePost(
                 urlString = "${baseUrl}/v1/chat/completions"
             ) {
                 contentType(Application.Json)
                 header(HttpHeaders.Authorization, "Bearer $apiKey")
-                setBody(params.toOpenAiChat())
+                setBody(request)
             }.execute { httpResponse ->
-                val channel: ByteReadChannel = httpResponse.body()
-                while (!channel.isClosedForRead) {
-                    channel.readUTF8Line()
-                        ?.takeIf { it.startsWith("data: ") }
-                        ?.removePrefix("data: ")
-                        ?.takeIf { it != "[DONE]" }
-                        ?.runCatching {
-                            parser.decodeFromString<OpenAiChatResponse>(this)
-                        }?.onFailure {
-                            error(StreamError(error = it.message ?: ""))
-                        }?.getOrThrow()
-                        ?.let {
-                            emit(it.toBaseResultModel())
-                        }
+                httpResponse.ensureSuccess()
+                if (request.stream) {
+                    httpResponse.body<ByteReadChannel>().forEachLine { line ->
+                        val data = sseData(line) ?: return@forEachLine
+                        emit(parser.decodeProviderChunk<OpenAiChatResponse>(data).toBaseResultModel())
+                    }
+                } else {
+                    emit(
+                        parser.decodeProviderChunk<OpenAiChatResponse>(httpResponse.bodyAsText())
+                            .toBaseResultModel(complete = true)
+                    )
                 }
             }
         }
     }
 }
 
-internal fun OpenAiChatResponse.toBaseResultModel(): BaseResultModel {
+/**
+ * @param complete true for a non-streamed response, which is always the final result.
+ */
+internal fun OpenAiChatResponse.toBaseResultModel(complete: Boolean = false): BaseResultModel {
     val choice = choices?.firstOrNull()
-    val delta = choice?.delta
+    val content = choice?.delta ?: choice?.message
     return BaseResultModel(
         model = model,
         createdAt = created.toString(),
-        response = delta?.content ?: "",
-        done = choice?.finishReason != null,
-        message = delta?.let { 
+        response = content?.content ?: "",
+        done = complete || choice?.finishReason != null,
+        promptEvalCount = usage?.promptTokens,
+        evalCount = usage?.completionTokens,
+        message = content?.let {
             Message(
                 role = it.role ?: "assistant",
                 content = it.content
@@ -74,15 +88,16 @@ internal fun OpenAiChatResponse.toBaseResultModel(): BaseResultModel {
 
 internal fun BaseParamsModel.toOpenAiChat(): OpenAiChatRequest {
     return OpenAiChatRequest(
-        model = model ?: throw IllegalArgumentException("Invalid Model"),
-        messages = get("messages") as? List<Message> ?: throw IllegalArgumentException("Invalid messages"),
-        stream = stream ?: true,
-        temperature = get("temperature") as? Double,
-        maxTokens = get("max_tokens") as? Int,
-        topP = get("top_p") as? Double,
-        frequencyPenalty = get("frequency_penalty") as? Double,
-        presencePenalty = get("presence_penalty") as? Double,
-        stop = get("stop") as? List<String>
+        model = requireModel(),
+        messages = messages() ?: throw IllegalArgumentException("Missing required parameter 'messages'"),
+        stream = boolean("stream") ?: true,
+        temperature = double("temperature"),
+        maxTokens = int("max_tokens"),
+        topP = double("top_p"),
+        frequencyPenalty = double("frequency_penalty"),
+        presencePenalty = double("presence_penalty"),
+        stop = stringList("stop"),
+        user = string("user")
     )
 }
 
@@ -90,7 +105,8 @@ internal fun BaseParamsModel.toOpenAiChat(): OpenAiChatRequest {
 internal data class OpenAiChatRequest(
     val model: String,
     val messages: List<Message>,
-    val stream: Boolean = true,
+    // No default value: encodeDefaults = false would otherwise drop "stream": true from the body.
+    val stream: Boolean,
     val temperature: Double? = null,
     @SerialName("max_tokens")
     val maxTokens: Int? = null,
@@ -100,7 +116,8 @@ internal data class OpenAiChatRequest(
     val frequencyPenalty: Double? = null,
     @SerialName("presence_penalty")
     val presencePenalty: Double? = null,
-    val stop: List<String>? = null
+    val stop: List<String>? = null,
+    val user: String? = null
 )
 
 @Serializable
@@ -110,13 +127,17 @@ internal data class OpenAiChatResponse(
     val objectType: String,
     val created: Long,
     val model: String,
-    val choices: List<OpenAiChoice>?
+    val choices: List<OpenAiChoice>?,
+    val usage: OpenAiUsage? = null
 )
 
 @Serializable
 internal data class OpenAiChoice(
     val index: Int,
+    /** Streamed chunk content. */
     val delta: OpenAiDelta? = null,
+    /** Non-streamed response content. */
+    val message: OpenAiDelta? = null,
     @SerialName("finish_reason")
     val finishReason: String? = null
 )
@@ -127,6 +148,12 @@ internal data class OpenAiDelta(
     val content: String? = null
 )
 
-internal data class StreamError(
-    val error: String
+@Serializable
+internal data class OpenAiUsage(
+    @SerialName("prompt_tokens")
+    val promptTokens: Int? = null,
+    @SerialName("completion_tokens")
+    val completionTokens: Int? = null,
+    @SerialName("total_tokens")
+    val totalTokens: Int? = null
 )

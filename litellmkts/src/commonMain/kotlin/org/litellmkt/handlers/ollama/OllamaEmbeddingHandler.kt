@@ -1,76 +1,52 @@
 package org.litellmkt.handlers.ollama
 
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType.Application
 import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.litellmkt.handlers.EmbeddingHandler
+import org.litellmkt.handlers.internal.decodeProviderChunk
+import org.litellmkt.handlers.internal.ensureSuccess
 import org.litellmkt.params.BaseParamsModel
+import org.litellmkt.params.boolean
+import org.litellmkt.params.requireModel
+import org.litellmkt.params.stringOrList
 import org.litellmkt.results.BaseResultModel
 
 class OllamaEmbeddingHandler(
+    private val parser: Json,
     private val baseUrl: String,
     private val httpClient: HttpClient
 ) : EmbeddingHandler {
 
     override fun embeddings(params: BaseParamsModel): Flow<BaseResultModel> {
         return flow {
-            emit(
-                httpClient.post(
-                    urlString = "$baseUrl/api/embed"
-                ) {
-                    contentType(Application.Json)
-                    setBody(params.toOllamaEmbeddingsParam())
-                }.body<HandlerResultOllamaEmbeddings>()
-            )
-        }.map {
-            it.toBaseResultModel()
+            val request = params.toOllamaEmbeddingsParam()
+            val httpResponse = httpClient.post(
+                urlString = "$baseUrl/api/embed"
+            ) {
+                contentType(Application.Json)
+                setBody(request)
+            }
+            httpResponse.ensureSuccess()
+            emit(parser.decodeProviderChunk<HandlerResultOllamaEmbeddings>(httpResponse.bodyAsText()).toBaseResultModel())
         }
     }
 }
 
 internal fun BaseParamsModel.toOllamaEmbeddingsParam(): HandlerEmbeddingsOllamaParams {
-    val options = HandlerParamsOllamaOptions(
-        numKeep = get("num_keep") as? Int,
-        seed = get("seed") as? Int,
-        numPredict = get("num_predict") as? Int,
-        topK = get("top_k") as? Int,
-        topP = get("top_p") as? Double,
-        minP = get("min_p") as? Double,
-        tfsZ = get("tfs_z") as? Double,
-        typicalP = get("typical_p") as? Double,
-        repeatLastN = get("repeat_last_n") as? Int,
-        temperature = get("temperature") as? Double,
-        repeatPenalty = get("repeat_penalty") as? Double,
-        presencePenalty = get("presence_penalty") as? Double,
-        frequencyPenalty = get("frequency_penalty") as? Double,
-        mirostat = get("mirostat") as? Int,
-        mirostatTau = get("mirostat_tau") as? Double,
-        mirostatEta = get("mirostat_eta") as? Double,
-        penalizeNewline = get("penalize_newline") as? Boolean,
-        stop = get("stop") as? List<String>,
-        numa = get("numa") as? Boolean,
-        numCtx = get("num_ctx") as? Int,
-        numBatch = get("num_batch") as? Int,
-        numGpu = get("num_gpu") as? Int,
-        mainGpu = get("main_gpu") as? Int ?: 0,
-        lowVram = get("low_vram") as? Boolean,
-        vocabOnly = get("vocab_only") as? Boolean,
-        useMmap = get("use_mmap") as? Boolean,
-        useMlock = get("use_mlock") as? Boolean,
-        numThread = get("num_thread") as? Int
-    )
     return HandlerEmbeddingsOllamaParams(
-        model = model ?: throw IllegalArgumentException("Invalid model"),
-        input = get("input") as? List<String> ?: throw IllegalArgumentException("Invalid Input"),
-        truncate = get("truncate") as? Boolean,
-        options = options
+        model = requireModel(),
+        input = stringOrList("input") ?: throw IllegalArgumentException("Missing required parameter 'input'"),
+        truncate = boolean("truncate"),
+        options = toOllamaOptions()
     )
 }
 
@@ -79,29 +55,33 @@ internal data class HandlerEmbeddingsOllamaParams(
     val model: String,
     val input: List<String>,
     val truncate: Boolean? = null,
-    //val options: Map<String, String>? = null,
     val options: HandlerParamsOllamaOptions? = null
 )
 
 @Serializable
-data class HandlerResultOllamaEmbeddings(
+internal data class HandlerResultOllamaEmbeddings(
     val model: String,
     val embeddings: List<List<Double>>,
+    @SerialName("total_duration")
     val totalDuration: Long? = null,
+    @SerialName("load_duration")
     val loadDuration: Long? = null,
+    @SerialName("prompt_eval_count")
     val promptEvalCount: Int? = null,
+    @SerialName("prompt_eval_duration")
     val promptEvalDuration: Long? = null,
+    @SerialName("eval_count")
     val evalCount: Int? = null,
+    @SerialName("eval_duration")
     val evalDuration: Long? = null
 )
-
 
 internal fun HandlerResultOllamaEmbeddings.toBaseResultModel(): BaseResultModel {
     return BaseResultModel(
         model = model,
         createdAt = "",
         response = "",
-        done = false,
+        done = true,
         totalDuration = totalDuration,
         loadDuration = loadDuration,
         promptEvalCount = promptEvalCount,

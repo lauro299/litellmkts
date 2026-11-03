@@ -1,7 +1,6 @@
 package org.litellmkt.handlers.ollama
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.koin.KoinExtension
 import io.kotest.matchers.shouldBe
@@ -35,6 +34,7 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.mock.declare
 import org.litellmkt.di.HandlersModule
+import org.litellmkt.errors.ProviderHttpException
 import org.litellmkt.di.getLitellmktModule
 import org.litellmkt.handlers.GenerationHandler
 import org.litellmkt.handlers.HandlerFactory
@@ -43,22 +43,23 @@ import org.litellmkt.types.LLMProvider
 
 class OllamaStreamHandlerTest : FunSpec(), KoinTest {
 
-    override fun extensions(): List<Extension> = listOf(
-        KoinExtension(
-            listOf(
-                HandlersModule().module,
-                module {
-                    single {
-                        Json {
-                            ignoreUnknownKeys = true
+    init {
+        extension(
+            KoinExtension(
+                listOf(
+                    HandlersModule().module,
+                    module {
+                        single {
+                            Json {
+                                ignoreUnknownKeys = true
+                            }
                         }
-                    }
-                    single(named("baseUrl")) { "baseUrl" }
-                },
-
+                        single(named("baseUrl")) { "baseUrl" }
+                    },
                 ),
+            )
         )
-    )
+    }
 
     val createHttpClient: (suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData) -> HttpClient =
         { body: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData ->
@@ -229,7 +230,7 @@ class OllamaStreamHandlerTest : FunSpec(), KoinTest {
                 handlerFactory.createGenerationHandler(LLMProvider.Ollama)
             }
             val ollamaHandler: GenerationHandler by inject()
-            shouldThrow<Exception> {
+            shouldThrow<ProviderHttpException> {
                 ollamaHandler.stream(
                     BaseParamsModel().also {
                         it["model"] = "model"

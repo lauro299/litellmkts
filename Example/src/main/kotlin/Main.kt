@@ -16,6 +16,8 @@ import org.litellmkt.handlers.ollama.OllamaChatHandler
 import org.litellmkt.handlers.ollama.OllamaEmbeddingHandler
 import org.litellmkt.handlers.ollama.OllamaGenerateGenerationHandler
 import org.litellmkt.params.BaseParamsModel
+import org.litellmkt.network.LitellmktConfig
+import io.ktor.client.plugins.logging.LogLevel
 import org.litellmkt.types.LLMProvider
 
 fun main() {
@@ -25,6 +27,7 @@ fun main() {
             getLitellmktModule(),
             module {
                 single(named("baseUrl")) { "http://192.168.100.42:11434" }
+                single { LitellmktConfig(socketTimeoutMillis = 60_000, logLevel = LogLevel.HEADERS) }
             })
     }
     val handlerFactory:HandlerFactory = localKoin.koin.get()

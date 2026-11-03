@@ -85,11 +85,13 @@ class ChatRequestBuilder {
     }
 
     fun build(): BaseParamsModel {
-        requireNotNull(model) { "Model is required" }
+        // Captured as locals: inside apply, `model` and `stream` would resolve to BaseParamsModel's own properties.
+        val model = requireNotNull(model) { "Model is required" }
+        val stream = stream
         require(messages.isNotEmpty()) { "At least one message is required" }
 
         return BaseParamsModel().apply {
-            put("model", model!!)
+            put("model", model)
             put("messages", messages.map { 
                 Message(
                     role = it.role.value,
@@ -103,7 +105,7 @@ class ChatRequestBuilder {
             frequencyPenalty?.let { put("frequency_penalty", it) }
             presencePenalty?.let { put("presence_penalty", it) }
             stop?.let { put("stop", it) }
-            put("stream", stream as Any)
+            put("stream", stream)
             user?.let { put("user", it) }
             additionalParams.forEach { (key, value) -> put(key, value) }
         }
@@ -185,19 +187,21 @@ class CompletionRequestBuilder {
     }
 
     fun build(): BaseParamsModel {
-        requireNotNull(model) { "Model is required" }
-        requireNotNull(prompt) { "Prompt is required" }
+        // Captured as locals: inside apply, `model` and `stream` would resolve to BaseParamsModel's own properties.
+        val model = requireNotNull(model) { "Model is required" }
+        val prompt = requireNotNull(prompt) { "Prompt is required" }
+        val stream = stream
 
         return BaseParamsModel().apply {
-            put("model", model!!)
-            put("prompt", prompt!!)
+            put("model", model)
+            put("prompt", prompt)
             temperature?.let { put("temperature", it) }
             maxTokens?.let { put("max_tokens", it) }
             topP?.let { put("top_p", it) }
             frequencyPenalty?.let { put("frequency_penalty", it) }
             presencePenalty?.let { put("presence_penalty", it) }
             stop?.let { put("stop", it) }
-            put("stream", stream as Any)
+            put("stream", stream)
             suffix?.let { put("suffix", it) }
             user?.let { put("user", it) }
             additionalParams.forEach { (key, value) -> put(key, value) }
@@ -255,11 +259,12 @@ class EmbeddingRequestBuilder {
     }
 
     fun build(): BaseParamsModel {
-        requireNotNull(model) { "Model is required" }
+        // Captured as a local: inside apply, `model` would resolve to BaseParamsModel's own property.
+        val model = requireNotNull(model) { "Model is required" }
         require(input.isNotEmpty()) { "At least one input text is required" }
 
         return BaseParamsModel().apply {
-            put("model", model!!)
+            put("model", model)
             put("input", input.toList())
             encodingFormat?.let { put("encoding_format", it) }
             dimensions?.let { put("dimensions", it) }

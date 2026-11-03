@@ -39,9 +39,15 @@ enum class MessageRole {
     SYSTEM,
     USER,
     ASSISTANT,
+    TOOL,
     FUNCTION;
     
     val value: String get() = name.lowercase()
+
+    companion object {
+        /** Case-insensitive lookup by wire value (e.g. "tool"); null for unknown roles. */
+        fun fromValue(raw: String): MessageRole? = entries.firstOrNull { it.value == raw.lowercase() }
+    }
 }
 
 /**

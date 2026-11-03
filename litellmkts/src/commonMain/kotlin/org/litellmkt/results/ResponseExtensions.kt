@@ -12,13 +12,15 @@ import kotlin.random.Random
  */
 
 fun BaseResultModel.toChatResponse(): ChatResponse {
+    val role = message?.let { MessageRole.fromValue(it.role) }
+    val unknownRole = message?.role?.takeIf { role == null }
     return ChatResponse(
         id = generateId(),
         model = model,
         content = response,
-        message = message?.let { 
+        message = message?.let {
             ChatMessage(
-                role = MessageRole.valueOf(it.role.uppercase()),
+                role = role ?: MessageRole.ASSISTANT,
                 content = it.content,
                 images = it.images
             )
@@ -29,7 +31,7 @@ fun BaseResultModel.toChatResponse(): ChatResponse {
         },
         usage = createTokenUsage(),
         performance = createPerformanceMetrics(),
-        metadata = createMetadata(),
+        metadata = createMetadata() + listOfNotNull(unknownRole?.let { "original_role" to it }),
         isStreaming = !done,
         isDone = done,
         createdAt = parseCreatedAt()
@@ -58,7 +60,7 @@ fun BaseResultModel.toEmbeddingResponse(): EmbeddingResponse {
     return EmbeddingResponse(
         id = generateId(),
         model = model,
-        embeddings = embeddings ?: emptyList(),
+        embeddings = embeddings,
         usage = createTokenUsage(),
         performance = createPerformanceMetrics(),
         metadata = createMetadata(),

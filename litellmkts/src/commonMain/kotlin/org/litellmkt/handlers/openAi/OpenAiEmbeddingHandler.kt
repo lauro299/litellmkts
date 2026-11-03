@@ -1,23 +1,30 @@
 package org.litellmkt.handlers.openAi
 
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType.Application
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.litellmkt.handlers.EmbeddingHandler
+import org.litellmkt.handlers.internal.decodeProviderChunk
+import org.litellmkt.handlers.internal.ensureSuccess
 import org.litellmkt.params.BaseParamsModel
+import org.litellmkt.params.int
+import org.litellmkt.params.requireModel
+import org.litellmkt.params.string
+import org.litellmkt.params.stringOrList
 import org.litellmkt.results.BaseResultModel
 
 class OpenAiEmbeddingHandler(
+    private val parser: Json,
     private val baseUrl: String,
     private val httpClient: HttpClient,
     private val apiKey: String
@@ -25,35 +32,27 @@ class OpenAiEmbeddingHandler(
 
     override fun embeddings(params: BaseParamsModel): Flow<BaseResultModel> {
         return flow {
-            emit(
-                httpClient.post(
-                    urlString = "$baseUrl/v1/embeddings"
-                ) {
-                    contentType(Application.Json)
-                    header(HttpHeaders.Authorization, "Bearer $apiKey")
-                    setBody(params.toOpenAiEmbedding())
-                }.body<OpenAiEmbeddingResponse>()
-            )
-        }.map {
-            it.toBaseResultModel()
+            val request = params.toOpenAiEmbedding()
+            val httpResponse = httpClient.post(
+                urlString = "$baseUrl/v1/embeddings"
+            ) {
+                contentType(Application.Json)
+                header(HttpHeaders.Authorization, "Bearer $apiKey")
+                setBody(request)
+            }
+            httpResponse.ensureSuccess()
+            emit(parser.decodeProviderChunk<OpenAiEmbeddingResponse>(httpResponse.bodyAsText()).toBaseResultModel())
         }
     }
 }
 
 internal fun BaseParamsModel.toOpenAiEmbedding(): OpenAiEmbeddingRequest {
-    val input = get("input")
-    val processedInput = when (input) {
-        is String -> listOf(input)
-        is List<*> -> input.filterIsInstance<String>()
-        else -> throw IllegalArgumentException("Invalid input - must be string or list of strings")
-    }
-    
     return OpenAiEmbeddingRequest(
-        model = model ?: throw IllegalArgumentException("Invalid model"),
-        input = processedInput,
-        encodingFormat = get("encoding_format") as? String,
-        dimensions = get("dimensions") as? Int,
-        user = get("user") as? String
+        model = requireModel(),
+        input = stringOrList("input") ?: throw IllegalArgumentException("Missing required parameter 'input'"),
+        encodingFormat = string("encoding_format"),
+        dimensions = int("dimensions"),
+        user = string("user")
     )
 }
 
@@ -63,7 +62,8 @@ internal fun OpenAiEmbeddingResponse.toBaseResultModel(): BaseResultModel {
         createdAt = "",
         response = "",
         done = true,
-        embeddings = data.map { it.embedding }
+        promptEvalCount = usage?.promptTokens,
+        embeddings = data.sortedBy { it.index }.map { it.embedding }
     )
 }
 
@@ -83,7 +83,7 @@ internal data class OpenAiEmbeddingResponse(
     val objectType: String,
     val data: List<OpenAiEmbeddingData>,
     val model: String,
-    val usage: OpenAiEmbeddingUsage
+    val usage: OpenAiEmbeddingUsage? = null
 )
 
 @Serializable
