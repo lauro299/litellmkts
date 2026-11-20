@@ -119,6 +119,10 @@ class HandlerFactory(
                 apiKey = apiKey ?: throw IllegalArgumentException("API key required for OpenAI")
             )
             is LLMProvider.Custom -> throw IllegalArgumentException("Custom provider not yet supported: ${provider.name}")
+            is LLMProvider.Local -> throw IllegalArgumentException(
+                "Local provider requires a local inference module (e.g. litellmkts-onnx). " +
+                "Use the module's getOnnxModule() or equivalent to register handlers for LLMProvider.Local."
+            )
         }
     }
 
