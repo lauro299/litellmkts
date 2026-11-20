@@ -42,5 +42,5 @@ Commands assume `JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Content
 ## 4. Integrated verification
 
 - [x] 4.1 Run `./gradlew :ExampleIos:shared:macosArm64Test :ExampleIos:shared:linkDebugFrameworkIosArm64` and the `xcodebuild` of 2.6, and verify everything passes
-- [ ] 4.2 Manual test (requires an installed iOS simulator runtime and a running Ollama or OpenAI-compatible server such as llama.cpp): launch the app in the simulator and verify that it lists models, that a reply appears token by token, that stop keeps the partial reply, and that an invalid URL shows the localized error with its detail and allows retrying
+- [x] 4.2 Manual test (requires an installed iOS simulator runtime and a running Ollama or OpenAI-compatible server such as llama.cpp): launch the app in the simulator and verify that it lists models, that a reply appears token by token, that stop keeps the partial reply, and that an invalid URL shows the localized error with its detail and allows retrying
 - [ ] 4.3 Manual test with the scheme's App Language set to "Double-Length Pseudolanguage": verify every UI string and the error descriptions are expanded (none comes from outside the catalog) and that no text is truncated
