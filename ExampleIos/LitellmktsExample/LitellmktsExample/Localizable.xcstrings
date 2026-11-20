@@ -1,0 +1,354 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "chat.empty.message" : {
+      "comment" : "Hint shown when there are no messages yet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick a model and send a message."
+          }
+        }
+      }
+    },
+    "chat.empty.title" : {
+      "comment" : "Title shown when there are no messages yet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a conversation"
+          }
+        }
+      }
+    },
+    "chat.message.placeholder" : {
+      "comment" : "Placeholder of the message field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message"
+          }
+        }
+      }
+    },
+    "chat.metrics.firstToken" : {
+      "comment" : "Reply metric; the placeholder is a duration such as \"1.3 sec\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ to first token"
+          }
+        }
+      }
+    },
+    "chat.metrics.speed" : {
+      "comment" : "Reply metric reported by the server; the placeholder is a number such as \"38.2\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ tokens/s"
+          }
+        }
+      }
+    },
+    "chat.metrics.speedApprox" : {
+      "comment" : "Estimated reply speed when the server reports no stats; the placeholder is a number such as \"37.9\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@ tokens/s"
+          }
+        }
+      }
+    },
+    "chat.metrics.total" : {
+      "comment" : "Reply metric; the placeholder is the total response time, such as \"8.2 sec\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ total"
+          }
+        }
+      }
+    },
+    "chat.send" : {
+      "comment" : "Button that sends the message.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        }
+      }
+    },
+    "chat.stop" : {
+      "comment" : "Button that stops the reply being generated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop"
+          }
+        }
+      }
+    },
+    "chat.title" : {
+      "comment" : "Navigation title of the chat screen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
+          }
+        }
+      }
+    },
+    "error.configuration" : {
+      "comment" : "Error title for invalid settings, such as an unsupported provider.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app is not configured correctly."
+          }
+        }
+      }
+    },
+    "error.dismiss" : {
+      "comment" : "Button that hides the error message.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss"
+          }
+        }
+      }
+    },
+    "error.http" : {
+      "comment" : "Error title without HTTP status.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server returned an error."
+          }
+        }
+      }
+    },
+    "error.http.status" : {
+      "comment" : "Error title; the placeholder is an HTTP status code such as 404.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server returned HTTP %lld."
+          }
+        }
+      }
+    },
+    "error.invalidResponse" : {
+      "comment" : "Error title when the server response is malformed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server sent a response that could not be read."
+          }
+        }
+      }
+    },
+    "error.network" : {
+      "comment" : "Error title when the server cannot be reached.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not connect to the server. Check the URL and that the server is running."
+          }
+        }
+      }
+    },
+    "error.provider" : {
+      "comment" : "Error title when the model fails while answering.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The model reported an error."
+          }
+        }
+      }
+    },
+    "error.unknown" : {
+      "comment" : "Error title for unexpected errors.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong."
+          }
+        }
+      }
+    },
+    "models.empty" : {
+      "comment" : "Shown in the model list when the server returns none.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server has no models."
+          }
+        }
+      }
+    },
+    "models.label" : {
+      "comment" : "Accessibility label of the model button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model"
+          }
+        }
+      }
+    },
+    "models.loading" : {
+      "comment" : "Shown while the model list is being requested.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading models…"
+          }
+        }
+      }
+    },
+    "models.none" : {
+      "comment" : "Shown on the model button when the server has no models.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No models"
+          }
+        }
+      }
+    },
+    "server.apiKey.placeholder" : {
+      "comment" : "Placeholder of the API key field for OpenAI-compatible servers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API key (optional)"
+          }
+        }
+      }
+    },
+    "server.connect" : {
+      "comment" : "Button that applies the server settings and reloads the models.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect"
+          }
+        }
+      }
+    },
+    "server.title" : {
+      "comment" : "Title of the server settings column.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        }
+      }
+    },
+    "server.type.label" : {
+      "comment" : "Label of the server type picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server type"
+          }
+        }
+      }
+    },
+    "server.type.ollama" : {
+      "comment" : "Server type option for Ollama servers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama"
+          }
+        }
+      }
+    },
+    "server.type.openAICompatible" : {
+      "comment" : "Server type option for servers with the OpenAI API, such as llama.cpp.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI-compatible"
+          }
+        }
+      }
+    },
+    "server.url.placeholder" : {
+      "comment" : "Placeholder of the server address field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server URL"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
