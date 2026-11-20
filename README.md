@@ -122,6 +122,13 @@ Each `ModelInfo` always has a `name`; the other fields are `null` when the provi
 (creation date) and `ownedBy`. OpenAI returns every model of the account, including embedding and audio models, so
 filter the list if you only need chat models.
 
+## iOS (Swift)
+
+[`ExampleIos`](ExampleIos/README.md) is a SwiftUI chat app for iPhone, iPad and Mac that uses the library from Swift. It includes a small
+Kotlin facade (`LitellmktsKit`) that configures Koin from Swift and exposes chat streaming and model listing as
+main-thread callbacks, plus `async`/`AsyncThrowingStream` wrappers. Its UI is localizable with String Catalogs. Open
+`ExampleIos/LitellmktsExample/LitellmktsExample.xcodeproj` and run; Xcode builds the Kotlin framework for you.
+
 ## Migrating to 0.1.0
 
 - **Errors:** flows used to fail with `IllegalStateException("StreamError(...)")`, or completed empty on HTTP errors. They now

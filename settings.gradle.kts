@@ -20,3 +20,4 @@ rootProject.name = "multiplatform-library-template"
 include(":litellmkts")
 include(":litellmkts-onnx")
 include("Example")
+include(":ExampleIos:shared")
