@@ -12,6 +12,7 @@ koin-annotations = "2.3.1"
 kotest = "6.2.6"
 ksp = "2.3.13"
 kotlinxDatetime = "0.6.2"
+onnxruntime = "1.24.3"
 statelyCommonLinuxx64 = "2.1.0"
 
 [libraries]
@@ -41,6 +42,8 @@ kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref 
 kotest-extensions-koin = { module = "io.kotest:kotest-extensions-koin", version.ref = "kotest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 stately-common-linuxx64 = { module = "co.touchlab:stately-common-linuxx64", version.ref = "statelyCommonLinuxx64" }
+
+onnxruntime = { module = "com.microsoft.onnxruntime:onnxruntime", version.ref = "onnxruntime" }
 
 [plugins]
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
